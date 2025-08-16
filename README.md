@@ -55,6 +55,7 @@ The system separates metadata and PDF content into two top-level directories:
    - Page searching
    - Page navigation/turning
    - Page section selection and clipping tool
+   - Display title histories
 
 ---
 
