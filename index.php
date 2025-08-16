@@ -25,7 +25,6 @@ $mode_array = getConfigArray($config_xml, 'viewermode');
 $history_array = getConfigArray($config_xml, 'histories');
 
 // Get the requested URL
-//$request_url = "https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 $request_url = "https://" . $_SERVER['HTTP_HOST'] . rtrim($_SERVER['REQUEST_URI'], "/");
 
 // Check if the URL already contains &q=
@@ -767,3 +766,4 @@ if ($searchTerm && count($foundInFiles) === 0): ?>
 }
 
 ?>
+
