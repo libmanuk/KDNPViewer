@@ -64,7 +64,7 @@ The system separates metadata and PDF content into two top-level directories:
 
 ## ✅ Notes
 
-- Assumes valid `id` format in requests
+- Requires valid `id` format in requests
 - Metadata schema must be consistent across issues
 - Designed for minimalism and performance
 
