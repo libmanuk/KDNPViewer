@@ -18,7 +18,7 @@ The viewer uses a URL parameter `id` with the following format:
 **Example:**
 
 
-→ _Adair County News_, May 18, 1923, Copy 01
+→ _Adair County News_, May 18, 1923, Copy 01 (ada1923051801)
 
 ---
 
