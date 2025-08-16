@@ -107,7 +107,6 @@ if (isset($_GET["q"])) {
     
       $baseDir = __DIR__ . '/pv/';
       $relativePath = $ttl . '/' . $ark;
-
         
       // Resolve absolute path securely
       $directory = rtrim(realpath($baseDir . $relativePath), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
@@ -766,4 +765,3 @@ if ($searchTerm && count($foundInFiles) === 0): ?>
 }
 
 ?>
-
