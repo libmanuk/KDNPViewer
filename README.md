@@ -43,7 +43,7 @@ The system separates metadata and PDF content into two top-level directories:
    - Full issue ID
 3. Constructs paths:
    - PDF: `pv/ttt/tttYYYYMMDDCC/tttYYYYMMDDCC.pdf`
-   - Metadata: `meta/ttt/tttYYYYMMDDCC/metadata.xml`
+   - Metadata: `meta/ttt/tttYYYYMMDDCC.xml`
 4. Loads:
    - PDF via **PDF.js**
    - Metadata XML
