@@ -1,0 +1,72 @@
+/* turn off some controls in the PDF.js viewer */
+
+#editorFreeText, #editorInk, #download, #viewLayers, #viewAttachments, #viewOutline, #secondaryOpenFile, #editorStamp {
+    display:none;
+}
+    
+#findbarOptionsTwoContainer > label:nth-of-type(1) {
+    display: none;
+}
+    
+#secondaryToolbarButtonContainer > div:nth-of-type(1) {
+    display: none;
+}
+
+#scrollVertical, #scrollHorizontal, #scrollWrapped, #presentationMode, #viewBookmark, #scrollPage, #secondaryToolbarButtonContainer > div:nth-of-type(6), #secondaryToolbarButtonContainer > div:nth-of-type(7), 
+#secondaryToolbarButtonContainer > div:nth-of-type(8), #documentProperties, #secondaryDownload {
+    display: none !important; 
+} 
+
+/* end */
+
+/* custom lity styles */
+
+.lity-image img {
+    background-color: #ffffff;
+}
+
+/* end */
+
+/* 404 page style */
+
+.site-container {
+  max-width: 50em;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  background-color: #fff;
+  box-sizing: border-box;
+  margin-bottom: 50px;
+}
+
+@media (max-width: 768px) {
+  .site-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+.site-error h1 {
+    color: #D1332E;
+}
+
+.site-error p span {
+    color: #D1332E;
+}
+
+body {
+   background-color: var(--body-bg-color);
+}
+
+i {
+    color: #000;
+}
+
+figure > img {
+    width: 100%;
+}
+
+.site-error h1 {
+    color: #333333;
+}
+
