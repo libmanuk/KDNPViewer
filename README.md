@@ -62,6 +62,7 @@ The system separates metadata and PDF content into two top-level directories:
 ## 📦 Dependencies
 
 - [PDF.js](https://mozilla.github.io/pdf.js/): Client-side PDF rendering
+- [html-to-image](https://github.com/bubkoo/html-to-image): Client-side Generate an image from a DOM node
 - PHP: For backend routing and file access
 - XML: Metadata format per issue
 
