@@ -55,6 +55,7 @@ The system separates metadata and PDF content into two top-level directories:
    - Viewer features powered by metadata
 6. Features:
    - Page searching
+   - Search hit highlighting
    - Page navigation/turning
    - Page section selection and clipping tool
    - Display title histories
