@@ -32,6 +32,8 @@ The system separates metadata and PDF content into two top-level directories:
 - Subdirectory structure is based on:
   - Title code (`ttt`)
   - Full issue ID (`tttYYYYMMDDCC`)
+  - meta/ttt/tttYYYYMMDDCC.xml
+  - pv/ttt/tttYYYYMMDDCC/tttYYYYMMDDCC.pdf
 
 ---
 
