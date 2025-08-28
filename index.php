@@ -107,7 +107,7 @@ if (isset($_GET["q"])) {
     
       $baseDir = __DIR__ . '/pv/';
       $relativePath = $ttl . '/' . $ark;
-        
+
       // Resolve absolute path securely
       $directory = rtrim(realpath($baseDir . $relativePath), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 
@@ -135,12 +135,18 @@ if (isset($_GET["q"])) {
 
       // Build the final embed path
       $embed = 'vwp.html?file=' . $basePath . 'page_' . $pageNum . '.pdf#zoom=page-fit';
-    		
-      $searchTerm = (isset($_GET['q']) 
-        && strpos($_GET['q'], '-') === false 
-    	&& stripos($_GET['q'], 'Newspaper issue') === false) 
-    	? trim($_GET['q']) 
-    	: '';
+    	
+      $searchTerm = (
+    	isset($_GET['q']) &&
+    	strpos($_GET['q'], '-') === false &&
+    	stripos($_GET['q'], 'Newspaper issue') === false &&
+    	stripos($_GET['q'], 'lds05,') === false &&
+    	stripos($_GET['q'], 'lds03,') === false &&
+    	stripos($_GET['q'], 'lds18,') === false &&
+    	stripos($_GET['q'], 'title,') === false &&
+    	stripos($_GET['q'], 'creator,') === false &&
+    	stripos($_GET['q'], 'sub,') === false
+      ) ? trim($_GET['q']) : '';
 
       $extraParams = '&zoom=page-fit&wholeword=true';
 
