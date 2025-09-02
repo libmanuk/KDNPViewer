@@ -43,7 +43,7 @@ The system separates metadata and PDF content into two top-level directories:
 
 ## 🔧 Viewer Workflow
 
-1. `viewer.php` reads the `id` parameter from the URL
+1. `index.php` reads the `id` parameter from the URL
 2. Extracts:
    - Title code (first 3 letters)
    - Full issue ID
