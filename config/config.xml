@@ -1,19 +1,4 @@
 <?xml version = "1.0" encoding = "UTF-8" standalone = "yes" ?>
 <config>
-    <side_nav_browse_head><![CDATA[Additional Details]]></side_nav_browse_head>
-    <side_nav_location_head><![CDATA[Location]]></side_nav_location_head>
-    <side_nav_use_head><![CDATA[Use Information]]></side_nav_use_head>
-    <side_nav_harm_head><![CDATA[Harmful Language Statement]]></side_nav_harm_head>
-    <side_nav_tools_head><![CDATA[Additional Details]]></side_nav_tools_head>
-    <side_nav_archives_head><![CDATA[Date Added]]></side_nav_archives_head>
-    <side_harm_statement><![CDATA[<p style="padding:15px;width: 90%;margin-left: auto;margin-right: auto;border: 1px solid lightgrey;background: #b1c9e8;">You may come across language in UK Libraries Special Collections Research Center collections and online resources that you find harmful or offensive. SCRC collects materials from different cultures and time periods to preserve and make available the historical record. These materials document the time period when they were created and the view of their creator. As a result, some may demonstrate racist and offensive views that do not reflect the values of UK Libraries.<br><br>If you find description with problematic language that you think SCRC should review, please contact us at <a href="mailto:SCRC@uky.edu">SCRC@uky.edu</a>.</p>]]></side_harm_statement>
-    <copyright><![CDATA[&#169; 2005-2025 Kentucky Digital Newspaper Program. All rights reserved.]]></copyright>
-    <address_line_01><![CDATA[<a href="https://libraries.uky.edu/locations/special-collections-research-center" target="_blank">Special Collections Research Center</a>]]></address_line_01>
-    <address_line_02><![CDATA[<a href="https://libraries.uky.edu" target="_blank">University of Kentucky Libraries</a>]]></address_line_02>
-    <address_line_03><![CDATA[Margaret I. King Library Building]]></address_line_03>
-    <address_line_04><![CDATA[Lexington, KY 40506-0039]]></address_line_04>
-    <website_link><![CDATA[<a href="https://kentuckynewspapers.org/program">Visit our website to learn more about our program.</a>]]></website_link>
-    <contact><![CDATA[<a href="https://libraries.uky.edu/ContactSCRC" target="_blank" rel="noopener">Contact Us</a>]]></contact>
-    <facebook><![CDATA[<a href="https://www.facebook.com/KyDNP/">https://www.facebook.com/KyDNP/</a>]]></facebook>
     <histories><![CDATA[ada, afr, ame, bee, blu, bou, brc, bre, cen, cit, cla, cri, dol, exa, fra, frn, haf, hao, haz, hic, hop, int, itx, kec, keg, ker, kev, lac, lre, lex, mad, mon, mou, mts, new, ovw, owi, pac, pub, ric, rec, spo, spr, wee, win]]></histories>
 </config>
