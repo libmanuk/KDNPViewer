@@ -19,7 +19,9 @@ The viewer uses a URL parameter `id` with the following format:
 
 
 → _Adair County News_, May 18, 1923, Copy 01 (ada1923051801)
+
 → _SAMPLE PHP Viewer URL: https://kdnp.uky.edu/?id=afr1900060101
+
 → _SAMPLE PDF.js URL: https://kdnp.uky.edu/vw.html?file=afr/afr19000060101/afr19000060101_text.pdf
 
 ---
