@@ -22,7 +22,7 @@ The viewer uses a URL parameter `id` with the following format:
 
 → _SAMPLE PHP Viewer URL: https://kdnp.uky.edu/?id=afr1900060101
 
-→ _SAMPLE PDF.js URL: https://kdnp.uky.edu/vw.html?file=afr/afr19000060101/afr19000060101_text.pdf
+→ _SAMPLE PDF.js URL: https://kdnp.uky.edu/vwp.html?file=pv/afr/afr1900060101/page_1.pdf
 
 ---
 
