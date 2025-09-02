@@ -1,205 +1,155 @@
 <?php
 // KDNP Viewer
 // University of Kentucky Libraries
-//
 
-// config variables
-$url = "404.html";
-$redirect_home = "https://sandbox01-na.primo.exlibrisgroup.com/discovery/search?vid=01SAA_UKY:KDNP&lang=en";
+// === Configuration ===
+define('REDIRECT_404', '404.html');
+define('REDIRECT_HOME', 'https://sandbox01-na.primo.exlibrisgroup.com/discovery/search?vid=01SAA_UKY:KDNP&lang=en');
+define('CONFIG_PATH', 'config/config.xml');
+define('META_BASE_PATH', __DIR__ . '/meta/');
+define('PV_BASE_PATH', __DIR__ . '/pv/');
 
-// load config xml file
-$config_meta = file_get_contents("config/config.xml");
-($config_xml = simplexml_load_string($config_meta)) or die("Error: Cannot create object");
+// === Helper Functions ===
+function redirectTo404() {
+    header("Location: " . REDIRECT_404);
+    exit;
+}
+
+function isValidArk(string $ark): bool {
+    return preg_match('/^[a-z]{3}[0-9]{10}$/', $ark);
+}
+
+function sanitize($input): string {
+    return htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+}
 
 function getConfigArray(SimpleXMLElement $xml, string $tag): array {
     $string = trim((string) $xml->$tag);
     return array_filter(array_map('trim', explode(',', $string)));
 }
 
+// === Redirect if just base URL is accessed without the script name or query ===
+$requestUri = $_SERVER['REQUEST_URI'] ?? '';
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+$queryString = $_SERVER['QUERY_STRING'] ?? '';
+
+if (($requestUri === '/' || $requestUri === '') && $queryString === '') {
+    header("Location: " . REDIRECT_HOME);
+    exit;
+}
+
+// === Redirect if script is accessed without an ID parameter ===
+if (!isset($_GET['id']) || trim($_GET['id']) === '') {
+    header("Location: " . REDIRECT_HOME);
+    exit;
+}
+
+// === Validate & Sanitize Input ===
+if (!isset($_GET['id']) || !isValidArk($_GET['id'])) {
+    redirectTo404("Invalid ARK ID");
+}
+
+$ark = sanitize($_GET['id']);
+$ttl = substr($ark, 0, 3);
+
+if (!preg_match('/^[a-z]{3}$/', $ttl)) {
+    redirectTo404("Invalid TTL format");
+}
+
+// === Load Configuration ===
+$config_meta = @file_get_contents(CONFIG_PATH) or redirectTo404();
+$config_xml = @simplexml_load_string($config_meta) or redirectTo404();
 $mode_array = getConfigArray($config_xml, 'viewermode');
 $history_array = getConfigArray($config_xml, 'histories');
 
-// Get the requested URL
-$request_url = "https://" . $_SERVER['HTTP_HOST'] . rtrim($_SERVER['REQUEST_URI'], "/");
+// === Validate Optional Query ===
+$query = $_GET['q'] ?? '';
+$query = (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $query)) ? trim($query) : '';
 
-// Check if the URL already contains &q=
-if (strpos($request_url, '&q=') === false) {
-    // Append &q= regardless of other parameters
-    $request_url .= '&q=';
+// === Load Metadata XML ===
+$metaPath = META_BASE_PATH . "$ttl/$ark.xml";
+if (!file_exists($metaPath) || !is_readable($metaPath)) {
+    redirectTo404();
+}
+$xml = @simplexml_load_file($metaPath) or redirectTo404();
+
+if (empty($xml->Pages)) {
+    redirectTo404();
 }
 
-// get valid id and generate page or redirect to homepage
-if (isset($_GET["id"])) {
-    $ark = $_GET["id"];
-
-    // Check if the input is 13 characters long and starts with three lowercase alphanumeric characters
-    if (strlen($ark) == 13 && preg_match('/^[a-z0-9]{3}/', $ark)) {
-        // Save the first three characters as a new variable
-        $ttl = substr($ark, 0, 3);
-    } else {
-        // Redirect to a fallback URL if ARK is invalid
-        header("Location: $url");
-        exit; 
-    }
-
-// long if statement that redirects to not found page    
-if (isset($_GET["q"])) {
-    $query = $_GET["q"];
-
-    // Only keep $query if it does NOT match the YYYY-MM-DD pattern
-    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $query)) {
-        // $query is valid and stays set
-    } else {
-        // $query matches the date pattern, so we unset it
-        unset($query);
-    }
+// === Secure Path Handling ===
+$relativePath = "$ttl/$ark";
+$directory = realpath(PV_BASE_PATH . $relativePath);
+if ($directory === false || strpos($directory, realpath(PV_BASE_PATH)) !== 0) {
+    redirectTo404();
 }
 
-    // Ensure proper validation and sanitization to prevent XSS or directory traversal attacks.
-    $ark = htmlspecialchars($ark, ENT_QUOTES, 'UTF-8');
-    $ttl = htmlspecialchars($ttl, ENT_QUOTES, 'UTF-8');
-    
-    // Check if the input is 13 characters long and starts with three lowercase alphanumeric characters
-    if (strlen($ark) == 13 && preg_match('/^[a-z0-9]{3}/', $ark)) {
-      // Save the first three characters as a new variable
-      $ttl = substr($ark, 0, 3);
+// === Locate First Existing Page ===
+$basePath = 'pv/' . urlencode($ttl) . '/' . urlencode($ark) . '/';
+$pageNum = 1;
+do {
+    $filePath = $basePath . 'page_' . $pageNum . '.pdf';
+    $fullPath = __DIR__ . '/' . $filePath;
+    $pageNum++;
+} while (!file_exists($fullPath));
+$pageNum--; // last valid
 
-      $metaPath = "meta/$ttl/$ark.xml";
+// === Build Viewer Embed Path ===
+$embed = 'vwp.html?file=' . $basePath . 'page_' . $pageNum . '.pdf#zoom=page-fit';
 
-      if (!file_exists($metaPath) || !is_readable($metaPath)) {
-        // Fallback: redirect to 404 or error page
-        header("Location: $url");
-        exit;
+// === Process Search Term ===
+$searchTerm = '';
+if (
+    $query &&
+    strpos($query, '-') === false &&
+    stripos($query, 'Newspaper issue') === false &&
+    !preg_match('/lds(05|03|18),|title,|creator,|sub,/i', $query)
+) {
+    $searchTerm = $query;
+}
+
+$extraParams = '&zoom=page-fit&wholeword=true';
+if (stripos($searchTerm, 'any,exact,') === 0) {
+    $searchTerm = substr($searchTerm, strlen('any,exact,'));
+    $extraParams = '&wholeword=true&zoom=page-fit';
+} elseif (stripos($searchTerm, 'any,contains,') === 0) {
+    $searchTerm = substr($searchTerm, strlen('any,contains,'));
+}
+
+// === Search Matching Text Files ===
+$foundInFiles = [];
+$txtFiles = glob($directory . '/page_*.txt') ?: [];
+natsort($txtFiles);
+
+if ($searchTerm) {
+    $searchTerm = substr($searchTerm, 0, 100); // limit to 100 characters
+
+    foreach ($txtFiles as $file) {
+        if (filesize($file) > 1024 * 1024) continue; // skip files >1MB
+            if (stripos(file_get_contents($file), $searchTerm) !== false) {
+                $foundInFiles[] = $file;
         }
+    }
 
-      $meta = file_get_contents($metaPath);
-      $xml = simplexml_load_string($meta);
-
-      if ($xml === false) {
-        // Handle invalid XML content gracefully
-        header("Location: $url");
-        exit;
-        }
-
-      // Extract metadata from the issue XML
-        
-      // Required elements
-      $xml_pages = $xml->Pages;
-
-      // Check if any of the variables are empty or null
-      if (empty($xml_pages)) {
-
-        // If any required variable is empty or null, redirect to the fallback URL
-        header("Location: $url");
-        exit; // Ensure no further code is executed
-        }
-        
-          } else {
-          // Redirect to a fallback URL if ARK is invalid
-          header("Location: $url");
-          exit; 
-            }
-    
-      $baseDir = __DIR__ . '/pv/';
-      $relativePath = $ttl . '/' . $ark;
-
-      // Resolve absolute path securely
-      $directory = rtrim(realpath($baseDir . $relativePath), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-
-      // Check if resolved path exists AND is within the base directory
-      if ($directory === false || strpos($directory, realpath($baseDir)) !== 0) {
-        // Invalid path or potential traversal detected
-        header("Location: $url");
-        exit;
-            }
-            
-      // If there are missing pages ... can't assume page_1 exists
-      $basePath = 'pv/' . urlencode($ttl) . '/' . urlencode($ark) . '/';
-
-      $pageNum = 1;
-
-      // Keep checking until the file exists
-      do {
-        $filePath = $basePath . 'page_' . $pageNum . '.pdf';
-        $fullPath = __DIR__ . '/' . $filePath; // Adjust base dir as needed
-        $pageNum++;
-      } while (!file_exists($fullPath));
-
-      // Go back one step because loop increments after check
-      $pageNum--;
-
-      // Build the final embed path
-      $embed = 'vwp.html?file=' . $basePath . 'page_' . $pageNum . '.pdf#zoom=page-fit';
-    	
-      $searchTerm = (
-    	isset($_GET['q']) &&
-    	strpos($_GET['q'], '-') === false &&
-    	stripos($_GET['q'], 'Newspaper issue') === false &&
-    	stripos($_GET['q'], 'lds05,') === false &&
-    	stripos($_GET['q'], 'lds03,') === false &&
-    	stripos($_GET['q'], 'lds18,') === false &&
-    	stripos($_GET['q'], 'title,') === false &&
-    	stripos($_GET['q'], 'creator,') === false &&
-    	stripos($_GET['q'], 'sub,') === false
-      ) ? trim($_GET['q']) : '';
-
-      $extraParams = '&zoom=page-fit&wholeword=true';
-
-      if (!empty($searchTerm)) {
-        // Check if it starts with "any,exact" or "any,contains"
-    	if (stripos($searchTerm, 'any,exact,') === 0) {
-          // Remove "any,exact" from the beginning
-          $searchTerm = trim(substr($searchTerm, strlen('any,exact,')));
-          //&phrase=true can also be added to params
-          $extraParams = '&wholeword=true&zoom=page-fit';
-    	    } elseif (stripos($searchTerm, 'any,contains,') === 0) {
-            // Remove "any,contains" from the beginning
-            $searchTerm = trim(substr($searchTerm, strlen('any,contains,')));
-            // No extra params added
-        }
-      }
-            
-      // Set array
-      $foundInFiles = [];
-
-      if ($searchTerm) {
-        $txtFiles = glob($directory . 'page_*.txt');
-
-      // First pass: try full search term
-      foreach ($txtFiles as $file) {
-        if (preg_match('/page_\d+\.txt$/', basename($file))) {
-          $contents = file_get_contents($file);
-          if (stripos($contents, $searchTerm) !== false) {
-            $foundInFiles[] = $file;
-          }
-        }
-      }
-
-      // Second pass: if no results and term has multiple words
-      if (empty($foundInFiles) && str_word_count($searchTerm) > 1) {
-        $searchWords = preg_split('/\s+/', $searchTerm);
+    // If no full matches, search word-by-word
+    if (empty($foundInFiles) && str_word_count($searchTerm) > 1) {
+        $words = preg_split('/\s+/', $searchTerm);
         foreach ($txtFiles as $file) {
-          if (preg_match('/page_\d+\.txt$/', basename($file))) {
-            $contents = file_get_contents($file);
-              foreach ($searchWords as $word) {
-                if (stripos($contents, $word) !== false) {
-                  $foundInFiles[] = $file;
-                    break; // Found at least one word, no need to check more
-                  }
+            $content = file_get_contents($file);
+            foreach ($words as $word) {
+                if (stripos($content, $word) !== false) {
+                    $foundInFiles[] = $file;
+                    break;
                 }
-          }
+            }
         }
-      }
-      } else {
-               $txtFiles = glob($directory . 'page_*.txt');
-      }
-            
-     natsort($txtFiles);  // Sort using "natural order"
-     $hitsMap = array_flip($foundInFiles ?? []);
-     $first_file = reset($txtFiles);
-     $totalFiles = count($foundInFiles);
+    }
+}
 
-// Build HTML page
+$hitsMap = array_flip($foundInFiles);
+$first_file = reset($txtFiles);
+
+// === HTML output ===
 ?>
 
 <!DOCTYPE html>
@@ -544,12 +494,3 @@ if ($searchTerm && count($foundInFiles) === 0): ?>
 </script>
 </body>
 </html>
-
-<?php
-    
-} else {
-    // Fallback behavior goes here
-    header("Location: $redirect_home");
-}
-
-?>
