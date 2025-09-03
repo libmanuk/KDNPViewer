@@ -59,7 +59,6 @@ if (!preg_match('/^[a-z]{3}$/', $ttl)) {
 // === Load Configuration ===
 $config_meta = @file_get_contents(CONFIG_PATH) or redirectTo404();
 $config_xml = @simplexml_load_string($config_meta) or redirectTo404();
-$mode_array = getConfigArray($config_xml, 'viewermode');
 $history_array = getConfigArray($config_xml, 'histories');
 
 // === Validate Optional Query ===
@@ -494,3 +493,4 @@ if ($searchTerm && count($foundInFiles) === 0): ?>
 </script>
 </body>
 </html>
+
