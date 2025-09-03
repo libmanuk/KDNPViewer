@@ -104,7 +104,13 @@ if (
     stripos($query, 'Newspaper issue') === false &&
     !preg_match('/lds(05|03|18),|title,|creator,|sub,/i', $query)
 ) {
-    $searchTerm = $query;
+    // Remove all-caps AND, OR, NOT from the query
+    $filteredQuery = preg_replace('/\b(AND|OR|NOT)\b/', '', $query);
+
+    // Optionally trim extra whitespace
+    $filteredQuery = trim(preg_replace('/\s+/', ' ', $filteredQuery));
+
+    $searchTerm = $filteredQuery;
 }
 
 $extraParams = '&zoom=page-fit&wholeword=true';
@@ -493,4 +499,5 @@ if ($searchTerm && count($foundInFiles) === 0): ?>
 </script>
 </body>
 </html>
+
 
